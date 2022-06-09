@@ -11,7 +11,7 @@ export default function NewTask(props) {
                   type="text"
                   id="task"
                   name="task"
-                  onchange={props.handleChange}
+                  onChange={props.handleChange}
                 />
             </form>
         </div>
