@@ -5,7 +5,7 @@ export default function TaskList (props) {
 
     return(
         <div>
-            <ol>{props.mapTaskList}</ol>
+            
         </div>
     )
 }
