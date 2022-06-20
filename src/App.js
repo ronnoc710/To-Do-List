@@ -5,8 +5,17 @@ import Controls from "./Components/Controls/Controls.jsx"
 import { nanoid } from "nanoid";
 import "./App.css"
 
+const FILTER_MAP = {
+  All: () => true,
+  Active: task => !task.completed,
+  Completed: task => task.completed
+};
+
+const FILTER_NAMES = Object.keys(FILTER_MAP);
+
 export default function App(props) {
   const [tasks, setTasks] = useState(props.tasks);
+  const [filter, setFilter] = useState("All");
 
   const addTask = (name) => {
     const newTask = { id: "todo-" + nanoid(), name: name, completed: false };
@@ -28,7 +37,19 @@ export default function App(props) {
     setTasks(remainingTasks);
   }
 
-  const taskList = tasks.map(task => (
+  function editTask(id, newName) {
+    const editedTaskList = tasks.map(task => {
+      if (id === task.id) {
+        return {...task, name: newName}
+      }
+      return task
+    });
+    setTasks(editedTaskList);
+  }
+
+  const taskList = tasks
+  .filter(FILTER_MAP[filter])
+  .map(task => (
     <ToDo
       id={task.id}
       name={task.name}
@@ -36,8 +57,19 @@ export default function App(props) {
       key={task.id}
       toggleTaskCompleted={toggleTaskCompleted}
       deleteTask={deleteTask}
+      editTask={editTask}
     />
   ));
+
+  const filterList = FILTER_NAMES.map(name => (
+    <Controls 
+      key={name} 
+      name={name}
+      isPressed={name === filter}
+      setFilter={setFilter}
+    />
+  ));
+  
 
   const tasksNoun = taskList.length !== 1 ? 'tasks' : 'task';
   const headingText = `${taskList.length} ${tasksNoun} remaining`;
@@ -47,9 +79,7 @@ export default function App(props) {
       <h1>Connor's To Do</h1>
         <Form addTask={addTask} />
       <div className="filters btn-group stack-exception">
-        <Controls />
-        <Controls />
-        <Controls />
+        {filterList}
       </div>
       <h2 id="list-heading">
         {headingText}
