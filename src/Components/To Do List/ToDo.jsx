@@ -1,9 +1,22 @@
-import React, { useState } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import './ToDo.css';
+
+function usePrevious(value) {
+  const ref = useRef();
+  useEffect(() => {
+    ref.current = value;
+  });
+  return ref.current;
+}
 
 export default function ToDo (props) {
   const [isEditing, setEditing] = useState(false);
+  const wasEditing = usePrevious(isEditing);
   const [newName, setNewName] = useState('');
+  
+
+  const editFieldRef = useRef(null);
+  const editButtonRef = useRef(null);
 
   function handleChange(e) {
     setNewName(e.target.value);
@@ -27,7 +40,8 @@ export default function ToDo (props) {
           className="todo-text"
           value={newName}
           onChange={handleChange} 
-          type="text" 
+          type="text"
+          ref={editFieldRef} 
         />
       </div>
       <div className="btn-group">
@@ -68,6 +82,7 @@ export default function ToDo (props) {
             type="button" 
             className="btn" 
             onClick={() => setEditing(true)}
+            ref={editButtonRef}
           >
             Edit <span className="visually-hidden">{props.name}</span>
           </button>
@@ -81,6 +96,15 @@ export default function ToDo (props) {
         </div>
     </div>
   );
+
+  useEffect(() => {
+    if (!wasEditing && isEditing) {
+      editFieldRef.current.focus();
+    } 
+    if (wasEditing && !isEditing) {
+      editButtonRef.current.focus();
+    }
+  }, [wasEditing, isEditing]);
 
   return ( 
       <li className="todo">
